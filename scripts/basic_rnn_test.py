@@ -1,42 +1,43 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-
 from numpy import typing as npt
-from torch import nn
-from torch import optim
+from torch import nn, optim
 
 from data.synthetic import SineWave
 from models.basic_rnn import RNN
 
 
-def visualize_sine(input_data: npt.NDArray[np.float64], output_data: npt.NDArray[np.float64]) -> None:
+def visualize_sine(input_data: npt.NDArray[np.float64], output_data: npt.NDArray[np.float64], timesteps: int) -> None:
+    """
+    Visualize the generated data (sine) used for training the RNN.
+    """
     fig, axs = plt.subplots(2, 3, figsize=(12, 8))
 
     for i in range(2):
         for j in range(3):
             # plot input sequence
-            axs[i, j].plot(input_data[i + j, :, 0], label='Input')
+            axs[i, j].plot(input_data[i + j, :, 0], label="Input")
 
             # plot output value with big marker
-            axs[i, j].plot(range(timesteps - 1, timesteps), output_data[i + j], marker='o', markersize=10, label='Output')
+            axs[i, j].plot(
+                range(timesteps - 1, timesteps), output_data[i + j], marker="o", markersize=10, label="Output"
+            )
 
             # set plot title, axis labels, and legend
-            axs[i, j].set_title(f'Sample {i+j+1}')
-            axs[i, j].set_xlabel('Time Step')
-            axs[i, j].set_ylabel('Feature Value / Value')
+            axs[i, j].set_title(f"Sample {i+j+1}")
+            axs[i, j].set_xlabel("Time Step")
+            axs[i, j].set_ylabel("Feature Value / Value")
             axs[i, j].legend()
 
-    plt.suptitle('Input and Output Sequences')
+    plt.suptitle("Input and Output Sequences")
     plt.tight_layout()
     plt.show()
 
 
 def create_train_test_datasets(
-        data_size: int,
-        input_data: npt.NDArray[np.float64],
-        output_data: npt.NDArray[np.float64],
-        p=0.8) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    data_size: int, input_data: npt.NDArray[np.float64], output_data: npt.NDArray[np.float64], p: float = 0.8
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """
     Create train and test datasets.
     Train dataset will be int(data_size * p)
@@ -67,7 +68,7 @@ def train_rnn(rnn_model: nn.Module) -> tuple[list, list]:
     val_losses = []
 
     criterion = nn.MSELoss()
-    optimizer = create_optimizer(model=rnn, lr=0.01)
+    optimizer = create_optimizer(model=rnn_model, lr=0.01)
 
     for epoch in range(70):
         rnn_model.train()
@@ -87,29 +88,26 @@ def train_rnn(rnn_model: nn.Module) -> tuple[list, list]:
             val_loss = criterion(outputs, torch.Tensor(y_test))
             val_losses.append(val_loss.item())
 
-        print('Epoch [{}/{}], Train Loss: {:.4f}, Val Loss: {:.4f}'.format(epoch+1, 70, loss.item(), val_loss.item()))
-    
+        print(f"Epoch [{epoch + 1}/{70}], Train Loss: {loss.item(): .4f}, Val Loss: {val_loss.item(): .4f}")
+
     return train_losses, val_losses
 
 
-timesteps = 10
-data_size = 1000
+if __name__ == "__main__":
 
-gen_sine = SineWave(timesteps=timesteps, data_size=data_size)
-input_data, output_data = gen_sine.generate_sine()
+    gen_sine = SineWave(timesteps=10, data_size=1000)
+    input_data, output_data = gen_sine.generate_sine()
 
-# visualize_sine(input_data=input_data, output_data=output_data)
-X_train, y_train, X_test, y_test = create_train_test_datasets(data_size=data_size, input_data=input_data, output_data=output_data)
+    # visualize_sine(input_data=input_data, output_data=output_data, timesteps=10)
+    X_train, y_train, X_test, y_test = create_train_test_datasets(
+        data_size=1000, input_data=input_data, output_data=output_data
+    )
 
-input_size = 1
-hidden_size = 32
-num_layers = 1
-batch_first = True
-rnn = RNN(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers, batch_first=batch_first)
+    rnn = RNN(input_size=1, hidden_size=32, num_layers=1, batch_first=True)
 
-train_loss, val_loss = train_rnn(rnn_model=rnn)
+    train_loss, val_loss = train_rnn(rnn_model=rnn)
 
-plt.plot(train_loss, label='Train Loss')
-plt.plot(val_loss, label='Validation Loss')
-plt.legend()
-plt.show()
+    plt.plot(train_loss, label="Train Loss")
+    plt.plot(val_loss, label="Validation Loss")
+    plt.legend()
+    plt.show()
