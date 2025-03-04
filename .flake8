@@ -1,0 +1,22 @@
+[flake8]
+max-line-length = 120
+max-complexity = 12
+exclude =
+    venv*
+    .venv/
+    *_jupytext.py
+extend-ignore =
+    # Allow missing `self` type annotation to make files less repetitive
+    ANN101
+    # Allow missing `cls` type annotation to make files less repetitive
+    ANN102
+    # E501 Due to Black's: try to respect --line-length, but don’t become crazy if you can’t
+    E203
+    E501
+suppress-none-returning = true
+suppress-dummy-args = true
+per-file-ignores =
+    # imported but unused
+    __init__.py: F401
+    # missing return type annotation for test functions can be ignored
+    */tests/*: ANN201

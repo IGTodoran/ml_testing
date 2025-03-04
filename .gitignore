@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+.DS_Store
+.vscode
+.devcontainer
+.pytest_cache
+build
+dist/
+docs/public/
+
+# Python related things
+*venv*/
+*egg-info*
+
+# Jupyter Notebook checkpoints
+**/.ipynb_checkpoints/
+
+# caches
+.ruff_cache/
+.mypy_cache/
