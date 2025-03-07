@@ -63,11 +63,11 @@ def evaluate_model(model: nn.Module, X: torch.Tensor, y: torch.Tensor) -> torch.
     # Evaluate the model on the test data
     model.eval()
     with torch.no_grad():
-        y_pred = model(X_test)
+        y_pred = model(X)
 
     # Calculate the test loss
     criterion = nn.MSELoss()
-    test_loss = criterion(y_pred, y_test)
+    test_loss = criterion(y_pred, y)
     print(f"Test Loss: {test_loss.item(): .4f}")
 
     return y_pred
