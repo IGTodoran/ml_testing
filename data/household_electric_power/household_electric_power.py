@@ -1,9 +1,9 @@
 """
 Create Individual Household Electric Power Consumption data
 """
-from pathlib import Path
-
 import pandas as pd
+
+from pathlib import Path
 
 
 class HouseholdElectricPower:
